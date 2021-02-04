@@ -55,6 +55,12 @@ export interface BuildOptions extends CommonOptions {
   entryPoints?: string[];
   stdin?: StdinOptions;
   plugins?: Plugin[];
+  absWorkingDir?: string;
+  watch?: boolean | WatchMode;
+}
+
+export interface WatchMode {
+  onRebuild?: (error: BuildFailure | null, result: BuildResult | null) => void;
 }
 
 export interface StdinOptions {
@@ -100,7 +106,8 @@ export interface BuildIncremental extends BuildResult {
 export interface BuildResult {
   warnings: Message[];
   outputFiles?: OutputFile[]; // Only when "write: false"
-  rebuild?: BuildInvalidate; // Only when "incremental" is true
+  rebuild?: BuildInvalidate; // Only when "incremental: true"
+  stop?: () => void; // Only when "watch: true"
 }
 
 export interface BuildFailure extends Error {
@@ -176,6 +183,7 @@ export interface OnResolveArgs {
   importer: string;
   namespace: string;
   resolveDir: string;
+  pluginData: any;
 }
 
 export interface OnResolveResult {
@@ -187,6 +195,7 @@ export interface OnResolveResult {
   path?: string;
   external?: boolean;
   namespace?: string;
+  pluginData?: any;
 }
 
 export interface OnLoadOptions {
@@ -197,6 +206,7 @@ export interface OnLoadOptions {
 export interface OnLoadArgs {
   path: string;
   namespace: string;
+  pluginData: any;
 }
 
 export interface OnLoadResult {
@@ -208,6 +218,7 @@ export interface OnLoadResult {
   contents?: string | Uint8Array;
   resolveDir?: string;
   loader?: Loader;
+  pluginData?: any;
 }
 
 export interface PartialMessage {
